@@ -9,16 +9,15 @@
 import React from 'react'
 import { SafeAreaView, StatusBar } from 'react-native'
 
+import { SafeAreaProvider } from 'react-native-safe-area-context'
+
 import MainView from './src/main'
 
 const App: () => React.ReactNode = () => {
   return (
-    <>
-      <StatusBar barStyle="default" />
-      <SafeAreaView>
-        <MainView></MainView>
-      </SafeAreaView>
-    </>
+    <SafeAreaProvider>
+      <MainView />
+    </SafeAreaProvider>
   )
 }
 
