@@ -1,8 +1,9 @@
 import React from 'react'
-import {Text, TextInput, View} from 'react-native'
+import { Text, TextInput, View } from 'react-native'
 
 import { SafeAreaView } from 'react-native-safe-area-context'
 
+import SearchBar from '../components/SearchBar'
 import Constants from '../constants'
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -15,7 +16,11 @@ class SearchView extends React.Component<SearchProps, SearchState> {
     super(props)
   }
 
-  render() {
+  handleChangeSearchText(text: string): void {
+    console.log(text)
+  }
+
+  render(): React.ReactNode {
     return (
       <SafeAreaView style={{ flex: 1 }}>
         <View
@@ -24,18 +29,10 @@ class SearchView extends React.Component<SearchProps, SearchState> {
             height: 100,
             flex: 0.4,
             borderBottomWidth: 0.5,
-            borderBottomColor: 'grey',
+            borderBottomColor: '#d3d3d3',
             alignItems: 'center'
           }}>
-          <TextInput
-            style={{
-              height: 40,
-              width: Constants.screenWidth * 0.9,
-              borderColor: 'gray',
-              borderWidth: 1,
-              borderRadius: 20
-            }}
-          />
+          <SearchBar onChange={this.handleChangeSearchText} />
         </View>
         <View
           style={{
@@ -43,7 +40,9 @@ class SearchView extends React.Component<SearchProps, SearchState> {
             height: 200,
             flex: 5.6
           }}>
-          <Text>{''}</Text>
+          <Text>
+            <View></View>
+          </Text>
         </View>
       </SafeAreaView>
     )
