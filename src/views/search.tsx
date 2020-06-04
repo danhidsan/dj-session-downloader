@@ -1,8 +1,9 @@
 import React from 'react'
-import { Text, TextInput, View } from 'react-native'
+import { View, Image, Text} from 'react-native'
 
 import { SafeAreaView } from 'react-native-safe-area-context'
 
+import SongItem from '../components/SongItem'
 import SearchBar from '../components/SearchBar'
 import Constants from '../constants'
 
@@ -38,11 +39,15 @@ class SearchView extends React.Component<SearchProps, SearchState> {
           style={{
             width: Constants.screenWidth,
             height: 200,
-            flex: 5.6
+            flex: 5.6,
+            paddingTop: 5,
+            paddingHorizontal: 20
           }}>
-          <Text>
-            <View></View>
-          </Text>
+          <SongItem
+            title={'Nervo - Tomorrowland 2019'}
+            duration={'00:59'}
+            image={'https://i.ytimg.com/vi/CzgOulo5gOg/default.jpg'}
+          />
         </View>
       </SafeAreaView>
     )
