@@ -7,9 +7,12 @@ import { Song } from '../types'
 import SongItem from '../components/SongItem'
 import SearchBar from '../components/SearchBar'
 import Constants from '../constants'
+import { searchSong } from '../repositories/song'
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface SearchState {}
+export interface SearchState {
+  songs: Song[]
+}
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface SearchProps {}
 
@@ -60,10 +63,21 @@ const DATA: Array<Song> = [
 class SearchView extends React.Component<SearchProps, SearchState> {
   constructor(props: SearchProps) {
     super(props)
+    this.state = {
+      songs: []
+    }
+    this.handleChangeSearchText = this.handleChangeSearchText.bind(this)
   }
 
   handleChangeSearchText(text: string): void {
-    console.log(text)
+    searchSong(text)
+      .then((songs: Song[]) => {
+        console.log(songs)
+        this.setState({ songs: songs })
+      })
+      .catch((error) => {
+        console.log(error)
+      })
   }
 
   render(): React.ReactNode {
@@ -74,7 +88,7 @@ class SearchView extends React.Component<SearchProps, SearchState> {
         </View>
         <View style={style.container}>
           <FlatList
-            data={DATA}
+            data={this.state.songs}
             renderItem={({ item }) => <SongItem {...item} />}
             keyExtractor={(item) => item.id}
           />
