@@ -1,5 +1,11 @@
 import React from 'react'
-import { View, ViewStyle, StyleSheet, FlatList } from 'react-native'
+import {
+  View,
+  ViewStyle,
+  StyleSheet,
+  FlatList,
+  ActivityIndicator
+} from 'react-native'
 
 import { SafeAreaView } from 'react-native-safe-area-context'
 
@@ -9,9 +15,9 @@ import SearchBar from '../components/SearchBar'
 import Constants from '../constants'
 import { searchSong } from '../repositories/song'
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface SearchState {
   songs: Song[]
+  loading: boolean
 }
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface SearchProps {}
@@ -64,16 +70,17 @@ class SearchView extends React.Component<SearchProps, SearchState> {
   constructor(props: SearchProps) {
     super(props)
     this.state = {
-      songs: []
+      songs: [],
+      loading: false
     }
     this.handleChangeSearchText = this.handleChangeSearchText.bind(this)
   }
 
   handleChangeSearchText(text: string): void {
+    this.setState({ loading: true })
     searchSong(text)
       .then((songs: Song[]) => {
-        console.log(songs)
-        this.setState({ songs: songs })
+        this.setState({ songs: songs, loading: false })
       })
       .catch((error) => {
         console.log(error)
@@ -84,14 +91,18 @@ class SearchView extends React.Component<SearchProps, SearchState> {
     return (
       <SafeAreaView style={{ flex: 1 }}>
         <View style={style.header}>
-          <SearchBar onChange={this.handleChangeSearchText} />
+          <SearchBar onSubmit={this.handleChangeSearchText} />
         </View>
         <View style={style.container}>
-          <FlatList
-            data={this.state.songs}
-            renderItem={({ item }) => <SongItem {...item} />}
-            keyExtractor={(item) => item.id}
-          />
+          {!this.state.loading ? (
+            <FlatList
+              data={this.state.songs}
+              renderItem={({ item }) => <SongItem {...item} />}
+              keyExtractor={(item) => item.id}
+            />
+          ) : (
+            <ActivityIndicator size="small" color="grey" />
+          )}
         </View>
       </SafeAreaView>
     )

@@ -6,24 +6,43 @@ import Constants from '../constants'
 interface Styles {
   input: ViewStyle
 }
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-interface SearchBarState {}
+
+interface SearchBarState {
+  text: string
+}
 
 interface SearchBarProps {
-  onChange: (text: string) => void
+  onSubmit: (text: string) => void
 }
 
 class SearchBar extends React.Component<SearchBarProps, SearchBarState> {
   constructor(props: SearchBarProps) {
     super(props)
+    this.state = {
+      text: ''
+    }
+
+    this.handleChangeText = this.handleChangeText.bind(this)
+    this.handleOnSubmit = this.handleOnSubmit.bind(this)
+  }
+
+  handleOnSubmit(): void {
+    this.props.onSubmit(this.state.text)
+  }
+
+  handleChangeText(text: string): void {
+    this.setState({ text: text })
   }
 
   render(): React.ReactNode {
     return (
       <TextInput
+        value={this.state.text}
         placeholder={'Search session'}
-        onChangeText={this.props.onChange}
+        onChangeText={this.handleChangeText}
+        onSubmitEditing={this.handleOnSubmit}
         style={style.input}
+        clearButtonMode="while-editing"
       />
     )
   }
