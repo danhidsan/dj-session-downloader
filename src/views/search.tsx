@@ -27,45 +27,6 @@ interface SearchViewStyles {
   container: ViewStyle
 }
 
-const DATA: Array<Song> = [
-  {
-    id: 'Ifwz5BgY4eA',
-    title: 'NERVO Live @ Tomorrowland 2018',
-    duration: '00:59',
-    image: 'https://i.ytimg.com/vi/Ifwz5BgY4eA/default.jpg'
-  },
-  {
-    id: 'zs0EAexTA4o',
-    title: 'Nervo | Tomorrowland Belgium 2019',
-    duration: '00:59',
-    image: 'https://i.ytimg.com/vi/zs0EAexTA4o/default.jpg'
-  },
-  {
-    id: 'AZGOcZFRgd8',
-    title: 'Tomorrowland Belgium 2017 | Nervo',
-    duration: '01:59',
-    image: 'https://i.ytimg.com/vi/AZGOcZFRgd8/default.jpg'
-  },
-  {
-    id: 'CzgOulo5gOg',
-    title: 'Tomorrowland Belgium 2016 | NERVO',
-    duration: '00:59',
-    image: 'https://i.ytimg.com/vi/CzgOulo5gOg/default.jpg'
-  },
-  {
-    id: '_m9OgQkdVqQ',
-    title: 'NERVO - Tomorrowland Main Stage Saturday July 22, 2017',
-    duration: '01:59',
-    image: 'https://i.ytimg.com/vi/_m9OgQkdVqQ/default.jpg'
-  },
-  {
-    id: '05DSMz1Tyrk',
-    title: 'TomorrowWorld 2014 | NERVO',
-    duration: '00:49',
-    image: 'https://i.ytimg.com/vi/05DSMz1Tyrk/default.jpg'
-  }
-]
-
 class SearchView extends React.Component<SearchProps, SearchState> {
   constructor(props: SearchProps) {
     super(props)
@@ -73,7 +34,13 @@ class SearchView extends React.Component<SearchProps, SearchState> {
       songs: [],
       loading: false
     }
+
+    this._handleOnPressItem = this._handleOnPressItem.bind(this)
     this.handleChangeSearchText = this.handleChangeSearchText.bind(this)
+  }
+
+  _handleOnPressItem(itemId: string): void {
+    // TODO: Downloading logic here
   }
 
   handleChangeSearchText(text: string): void {
@@ -97,7 +64,9 @@ class SearchView extends React.Component<SearchProps, SearchState> {
           {!this.state.loading ? (
             <FlatList
               data={this.state.songs}
-              renderItem={({ item }) => <SongItem {...item} />}
+              renderItem={({ item }) => (
+                <SongItem {...item} onPress={this._handleOnPressItem} />
+              )}
               keyExtractor={(item) => item.id}
             />
           ) : (
