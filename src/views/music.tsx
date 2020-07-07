@@ -15,12 +15,12 @@ import {
 
 import SongItem from '../components/SongItem'
 import Constants from '../constants'
-import { Song } from '../types'
+import Session, { SessionTypes } from '../models/session'
 
 import { songs as test_songs } from '../testData'
 
 export interface MusicViewState {
-  songs: Song[]
+  songs: Session[]
   loading: boolean
 }
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -42,7 +42,7 @@ class MusicView extends React.Component<MusicViewProps, MusicViewState> {
     this._onItemLongPress = this._onItemLongPress.bind(this)
   }
 
-  _onItemPress(itemId: string): void {
+  _onItemPress(itemProps: string): void {
     // TODO: Playing logic here
   }
 

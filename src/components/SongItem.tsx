@@ -11,6 +11,8 @@ import {
 } from 'react-native'
 import Icon from 'react-native-vector-icons/MaterialIcons'
 
+import Session from '../models/session'
+
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 interface SongItemState {}
 interface SongItemProps {

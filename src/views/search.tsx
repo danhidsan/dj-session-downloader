@@ -4,19 +4,20 @@ import {
   ViewStyle,
   StyleSheet,
   FlatList,
-  ActivityIndicator
+  ActivityIndicator,
+  Alert
 } from 'react-native'
-
+import Realm from 'realm'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
-import { Song } from '../types'
+import Session, { SessionTypes } from '../models/session'
 import SongItem from '../components/SongItem'
 import SearchBar from '../components/SearchBar'
 import Constants from '../constants'
 import { searchSong } from '../repositories/song'
 
 export interface SearchState {
-  songs: Song[]
+  songs: SessionTypes[]
   loading: boolean
 }
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -36,17 +37,65 @@ class SearchView extends React.Component<SearchProps, SearchState> {
     }
 
     this._handleOnPressItem = this._handleOnPressItem.bind(this)
-    this.handleChangeSearchText = this.handleChangeSearchText.bind(this)
+    this._handleChangeSearchText = this._handleChangeSearchText.bind(this)
+  }
+
+  _saveSession(itemId: string): void {
+    const item: SessionTypes = this.state.songs.filter(
+      (item: SessionTypes) => item.id === itemId
+    )[0]
+
+    const realm = new Realm({ schema: [Session.schema] })
+    console.log(Realm.defaultPath)
+
+    try {
+      const existSession =
+        realm.objects<Session>(Session.schema.name).filtered(`id = "${itemId}"`)
+          .length > 0
+
+      if (!existSession) {
+        realm.write(() => {
+          const session = new Session(
+            item.id,
+            '',
+            item.image,
+            item.title,
+            `${item.id}.mp3`
+          )
+          realm.create(Session.schema.name, session)
+        })
+      } else {
+        this._sessionExistAlert()
+      }
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  _sessionExistAlert(): void {
+    Alert.alert('This session is already saved')
   }
 
   _handleOnPressItem(itemId: string): void {
-    // TODO: Downloading logic here
+    Alert.alert(
+      'Download this session?',
+      'Then, the session has been stored in device',
+      [
+        { text: 'Ok', onPress: () => this._saveSession(itemId) },
+        {
+          text: 'Cancel',
+          onPress: () => console.log('Canceling download...'),
+          style: 'cancel'
+        }
+      ],
+      { cancelable: false }
+    )
   }
 
-  handleChangeSearchText(text: string): void {
+  _handleChangeSearchText(text: string): void {
     this.setState({ loading: true })
     searchSong(text)
-      .then((songs: Song[]) => {
+      .then((songs: Session[]) => {
         this.setState({ songs: songs, loading: false })
       })
       .catch((error) => {
@@ -58,7 +107,7 @@ class SearchView extends React.Component<SearchProps, SearchState> {
     return (
       <SafeAreaView style={{ flex: 1 }}>
         <View style={style.header}>
-          <SearchBar onSubmit={this.handleChangeSearchText} />
+          <SearchBar onSubmit={this._handleChangeSearchText} />
         </View>
         <View style={style.container}>
           {!this.state.loading ? (
