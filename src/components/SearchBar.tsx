@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, FC } from 'react'
 import { StyleSheet, TextInput, ViewStyle } from 'react-native'
 
 import Constants from '../constants'
@@ -7,45 +7,31 @@ interface Styles {
   input: ViewStyle
 }
 
-interface SearchBarState {
-  text: string
-}
-
 interface SearchBarProps {
   onSubmit: (text: string) => void
 }
 
-class SearchBar extends React.Component<SearchBarProps, SearchBarState> {
-  constructor(props: SearchBarProps) {
-    super(props)
-    this.state = {
-      text: ''
-    }
+const SearchBar: FC<SearchBarProps> = ({ onSubmit }: SearchBarProps) => {
+  const [text, setText] = useState<string>('')
 
-    this.handleChangeText = this.handleChangeText.bind(this)
-    this.handleOnSubmit = this.handleOnSubmit.bind(this)
+  const handleOnSubmit = (): void => {
+    onSubmit(text)
   }
 
-  handleOnSubmit(): void {
-    this.props.onSubmit(this.state.text)
+  const handleChangeText = (text: string): void => {
+    setText(text)
   }
 
-  handleChangeText(text: string): void {
-    this.setState({ text: text })
-  }
-
-  render(): React.ReactNode {
-    return (
-      <TextInput
-        value={this.state.text}
-        placeholder={'Search session'}
-        onChangeText={this.handleChangeText}
-        onSubmitEditing={this.handleOnSubmit}
-        style={style.input}
-        clearButtonMode="while-editing"
-      />
-    )
-  }
+  return (
+    <TextInput
+      value={text}
+      placeholder={'Search session'}
+      onChangeText={handleChangeText}
+      onSubmitEditing={handleOnSubmit}
+      style={style.input}
+      clearButtonMode="while-editing"
+    />
+  )
 }
 
 const style = StyleSheet.create<Styles>({
