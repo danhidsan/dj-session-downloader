@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { FC } from 'react'
 import {
   Image,
   Text,
@@ -11,10 +11,6 @@ import {
 } from 'react-native'
 import Icon from 'react-native-vector-icons/MaterialIcons'
 
-import Session from '../models/session'
-
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-interface SongItemState {}
 interface SongItemProps {
   id: string
   title: string
@@ -36,42 +32,37 @@ interface SongItemStyle {
   actionText: TextStyle
 }
 
-class SongItem extends React.Component<SongItemProps, SongItemState> {
-  constructor(props: SongItemProps) {
-    super(props)
-  }
-
-  render(): React.ReactNode {
-    return (
-      <TouchableOpacity
-        onPress={() => this.props.onPress(this.props.id)}
-        onLongPress={() =>
-          this.props.onLongPress ? this.props.onLongPress(this.props.id) : null
-        }>
-        <View
-          style={{
-            flexDirection: 'row',
-            height: 120
-          }}>
-          <View style={style.imageContainer}>
-            <Image
-              style={style.image}
-              source={{
-                uri: this.props.image
-              }}
-            />
-          </View>
-          <View style={style.textContainer}>
-            <Text style={style.title}>{this.props.title}</Text>
-            <View style={style.timeContainer}>
-              <Text style={style.duration}>{this.props.duration}</Text>
-              {this.props.saved ? <Icon name="play-arrow" size={40} /> : null}
-            </View>
+const SongItem: FC<SongItemProps> = ({
+  id,
+  title,
+  duration,
+  saved,
+  image,
+  onLongPress,
+  onPress
+}: SongItemProps) => {
+  return (
+    <TouchableOpacity
+      onPress={() => onPress(id)}
+      onLongPress={() => (onLongPress ? onLongPress(id) : null)}>
+      <View
+        style={{
+          flexDirection: 'row',
+          height: 120
+        }}>
+        <View style={style.imageContainer}>
+          <Image style={style.image} source={{ uri: image }} />
+        </View>
+        <View style={style.textContainer}>
+          <Text style={style.title}>{title}</Text>
+          <View style={style.timeContainer}>
+            <Text style={style.duration}>{duration}</Text>
+            {saved ? <Icon name="play-arrow" size={40} /> : null}
           </View>
         </View>
-      </TouchableOpacity>
-    )
-  }
+      </View>
+    </TouchableOpacity>
+  )
 }
 
 const style = StyleSheet.create<SongItemStyle>({
