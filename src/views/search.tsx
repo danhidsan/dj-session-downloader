@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { FC, useState } from 'react'
 import {
   View,
   ViewStyle,
@@ -16,33 +16,35 @@ import SearchBar from '../components/SearchBar'
 import Constants from '../constants'
 import { searchSong } from '../repositories/song'
 
-export interface SearchState {
-  songs: SessionTypes[]
-  loading: boolean
-}
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface SearchProps {}
-
 interface SearchViewStyles {
   header: ViewStyle
   container: ViewStyle
 }
 
-class SearchView extends React.Component<SearchProps, SearchState> {
-  constructor(props: SearchProps) {
-    super(props)
-    this.state = {
-      songs: [],
-      loading: false
-    }
+const useVideo = (): [
+  boolean,
+  Session[],
+  (text: string) => void,
+  (sessionId: string) => void
+] => {
+  const [loading, setLoading] = useState<boolean>(false)
+  const [sessions, setSessions] = useState<Session[]>([])
 
-    this._handleOnPressItem = this._handleOnPressItem.bind(this)
-    this._handleChangeSearchText = this._handleChangeSearchText.bind(this)
+  const searchSession = (text: string): void => {
+    setLoading(true)
+    searchSong(text)
+      .then((songs: Session[]) => {
+        setSessions(songs)
+        setLoading(false)
+      })
+      .catch((error) => {
+        console.log(error)
+      })
   }
 
-  _saveSession(itemId: string): void {
-    const item: SessionTypes = this.state.songs.filter(
-      (item: SessionTypes) => item.id === itemId
+  const saveSession = (sessionId: string) => {
+    const item: SessionTypes = sessions.filter(
+      (item: SessionTypes) => item.id === sessionId
     )[0]
 
     const realm = new Realm({ schema: [Session.schema] })
@@ -50,8 +52,9 @@ class SearchView extends React.Component<SearchProps, SearchState> {
 
     try {
       const existSession =
-        realm.objects<Session>(Session.schema.name).filtered(`id = "${itemId}"`)
-          .length > 0
+        realm
+          .objects<Session>(Session.schema.name)
+          .filtered(`id = "${sessionId}"`).length > 0
 
       if (!existSession) {
         realm.write(() => {
@@ -65,23 +68,25 @@ class SearchView extends React.Component<SearchProps, SearchState> {
           realm.create(Session.schema.name, session)
         })
       } else {
-        this._sessionExistAlert()
+        Alert.alert('This session is already saved')
       }
     } catch (error) {
       console.log(error)
     }
   }
 
-  _sessionExistAlert(): void {
-    Alert.alert('This session is already saved')
-  }
+  return [loading, sessions, searchSession, saveSession]
+}
 
-  _handleOnPressItem(itemId: string): void {
+const SearchView: FC = () => {
+  const [loading, sessions, searchSession, saveSession] = useVideo()
+
+  const handleOnPressItem = (sessionId: string): void => {
     Alert.alert(
       'Download this session?',
       'Then, the session has been stored in device',
       [
-        { text: 'Ok', onPress: () => this._saveSession(itemId) },
+        { text: 'Ok', onPress: () => saveSession(sessionId) },
         {
           text: 'Cancel',
           onPress: () => console.log('Canceling download...'),
@@ -92,39 +97,26 @@ class SearchView extends React.Component<SearchProps, SearchState> {
     )
   }
 
-  _handleChangeSearchText(text: string): void {
-    this.setState({ loading: true })
-    searchSong(text)
-      .then((songs: Session[]) => {
-        this.setState({ songs: songs, loading: false })
-      })
-      .catch((error) => {
-        console.log(error)
-      })
-  }
-
-  render(): React.ReactNode {
-    return (
-      <SafeAreaView style={{ flex: 1 }}>
-        <View style={style.header}>
-          <SearchBar onSubmit={this._handleChangeSearchText} />
-        </View>
-        <View style={style.container}>
-          {!this.state.loading ? (
-            <FlatList
-              data={this.state.songs}
-              renderItem={({ item }) => (
-                <SongItem {...item} onPress={this._handleOnPressItem} />
-              )}
-              keyExtractor={(item) => item.id}
-            />
-          ) : (
-            <ActivityIndicator size="small" color="grey" />
-          )}
-        </View>
-      </SafeAreaView>
-    )
-  }
+  return (
+    <SafeAreaView style={{ flex: 1 }}>
+      <View style={style.header}>
+        <SearchBar onSubmit={searchSession} />
+      </View>
+      <View style={style.container}>
+        {!loading ? (
+          <FlatList
+            data={sessions}
+            renderItem={({ item }) => (
+              <SongItem {...item} onPress={handleOnPressItem} />
+            )}
+            keyExtractor={(item) => item.id}
+          />
+        ) : (
+          <ActivityIndicator size="small" color="grey" />
+        )}
+      </View>
+    </SafeAreaView>
+  )
 }
 
 const style = StyleSheet.create<SearchViewStyles>({
