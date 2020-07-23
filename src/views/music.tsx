@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { FC, useState, useEffect } from 'react'
 import {
   ActivityIndicator,
   FlatList,
@@ -19,34 +19,44 @@ import Session, { SessionTypes } from '../models/session'
 
 import { songs as test_songs } from '../testData'
 
-export interface MusicViewState {
-  songs: Session[]
-  loading: boolean
-}
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface MusicViewProps extends ActionSheetProps {}
-
 interface MusicViewStyles {
   container: ViewStyle
 }
 
-class MusicView extends React.Component<MusicViewProps, MusicViewState> {
-  constructor(props: MusicViewProps) {
-    super(props)
-    this.state = {
-      loading: false,
-      songs: test_songs
-    }
+const useMusicSession = () => {
+  const [sessions, setSessions] = useState<Session[]>([])
 
-    this._onItemPress = this._onItemPress.bind(this)
-    this._onItemLongPress = this._onItemLongPress.bind(this)
+  const deleteSession = (sessionId: string) => {
+    // TODO: Realm deleting logic here
+
+    // Deleting music session from state
+    const sessionsCopy: Session[] = sessions.filter(
+      (value: Session, index: number) => {
+        if (value.id !== sessionId) return value
+      }
+    )
+    setSessions(sessionsCopy)
   }
 
-  _onItemPress(itemProps: string): void {
+  useEffect(() => {
+    // TODO: Realm retreving logic here
+
+    // adding test data
+    setSessions(test_songs)
+  }, [])
+
+  return [sessions, deleteSession] as [Session[], (sessionId: string) => void]
+}
+
+const MusicView: FC<ActionSheetProps> = (props: ActionSheetProps) => {
+  const [loading, setLoading] = useState<boolean>(false)
+  const [sessions, deleteSession] = useMusicSession()
+
+  const onItemPress = (itemProps: string): void => {
     // TODO: Playing logic here
   }
 
-  _onItemLongPress(itemId: string): void {
+  const onItemLongPress = (itemId: string): void => {
     const buttons: string[] = ['Delete', 'Cancel']
     const destructiveButtonIndex = 0
     const cancelButtonIndex = 1
@@ -57,37 +67,35 @@ class MusicView extends React.Component<MusicViewProps, MusicViewState> {
       cancelButtonIndex
     }
 
-    this.props.showActionSheetWithOptions(options, (buttonIndex: number) => {
+    props.showActionSheetWithOptions(options, (buttonIndex: number) => {
       if (buttonIndex === 0) {
-        // TODO: Deleting logic here
         console.log(`Deleting ${itemId}`)
+        deleteSession(itemId)
       }
     })
   }
 
-  render() {
-    return (
-      <SafeAreaView>
-        <View style={style.container}>
-          {!this.state.loading ? (
-            <FlatList
-              data={this.state.songs}
-              renderItem={({ item }) => (
-                <SongItem
-                  {...item}
-                  onLongPress={this._onItemLongPress}
-                  onPress={this._onItemPress}
-                />
-              )}
-              keyExtractor={(item) => item.id}
-            />
-          ) : (
-            <ActivityIndicator size="small" color="grey" />
-          )}
-        </View>
-      </SafeAreaView>
-    )
-  }
+  return (
+    <SafeAreaView>
+      <View style={style.container}>
+        {!loading ? (
+          <FlatList
+            data={sessions}
+            renderItem={({ item }) => (
+              <SongItem
+                {...item}
+                onLongPress={onItemLongPress}
+                onPress={onItemPress}
+              />
+            )}
+            keyExtractor={(item) => item.id}
+          />
+        ) : (
+          <ActivityIndicator size="small" color="grey" />
+        )}
+      </View>
+    </SafeAreaView>
+  )
 }
 
 const style = StyleSheet.create<MusicViewStyles>({
