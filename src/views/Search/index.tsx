@@ -1,25 +1,12 @@
 import React, { FC, useState } from 'react'
-import {
-  View,
-  ViewStyle,
-  StyleSheet,
-  FlatList,
-  ActivityIndicator,
-  Alert
-} from 'react-native'
+import { View, FlatList, ActivityIndicator, Alert } from 'react-native'
 import Realm from 'realm'
 import { SafeAreaView } from 'react-native-safe-area-context'
-
-import Session, { SessionTypes } from '../models/session'
-import SongItem from '../components/SongItem'
-import SearchBar from '../components/SearchBar'
-import Constants from '../constants'
-import { searchSong } from '../repositories/song'
-
-interface SearchViewStyles {
-  header: ViewStyle
-  container: ViewStyle
-}
+import Session, { SessionTypes } from '../../models/session'
+import SongItem from '../../components/SongItem'
+import SearchBar from '../../components/SearchBar'
+import { searchSong } from '../../repositories/song'
+import style from './styles'
 
 const useVideo = (): [
   boolean,
@@ -118,23 +105,5 @@ const SearchView: FC = () => {
     </SafeAreaView>
   )
 }
-
-const style = StyleSheet.create<SearchViewStyles>({
-  header: {
-    width: Constants.screenWidth,
-    height: 100,
-    flex: 0.4,
-    borderBottomWidth: 0.5,
-    borderBottomColor: '#d3d3d3',
-    alignItems: 'center'
-  },
-  container: {
-    width: Constants.screenWidth,
-    height: 200,
-    flex: 5.6,
-    paddingTop: 5,
-    paddingHorizontal: 20
-  }
-})
 
 export default SearchView

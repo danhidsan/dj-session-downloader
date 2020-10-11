@@ -1,27 +1,15 @@
 import React, { FC, useState, useEffect } from 'react'
-import {
-  ActivityIndicator,
-  FlatList,
-  StyleSheet,
-  View,
-  ViewStyle
-} from 'react-native'
+import { ActivityIndicator, FlatList, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import {
   connectActionSheet,
   ActionSheetProps,
   ActionSheetOptions
 } from '@expo/react-native-action-sheet'
-
-import SongItem from '../components/SongItem'
-import Constants from '../constants'
-import Session, { SessionTypes } from '../models/session'
-
-import { songs as test_songs } from '../testData'
-
-interface MusicViewStyles {
-  container: ViewStyle
-}
+import SongItem from '../../components/SongItem'
+import Session from '../../models/session'
+import { songs as test_songs } from '../../testData'
+import style from './styles'
 
 const useMusicSession = () => {
   const [sessions, setSessions] = useState<Session[]>([])
@@ -97,14 +85,6 @@ const MusicView: FC<ActionSheetProps> = (props: ActionSheetProps) => {
     </SafeAreaView>
   )
 }
-
-const style = StyleSheet.create<MusicViewStyles>({
-  container: {
-    width: Constants.screenWidth,
-    paddingTop: 5,
-    paddingHorizontal: 20
-  }
-})
 
 const connectedActionSheet = connectActionSheet(MusicView)
 
