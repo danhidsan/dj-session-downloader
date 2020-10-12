@@ -6,8 +6,8 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import { ActionSheetProvider } from '@expo/react-native-action-sheet'
 
 // Views
-import MusicView from './views/music'
-import SearchView from './views/search'
+import MusicView from './views/Music'
+import SearchView from './views/Search'
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface MainState {}
